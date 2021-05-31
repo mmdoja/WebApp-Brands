@@ -1,6 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request
 from webappbackend import app, mongo, bcrypt, db_operations
 from webappbackend.forms import RegistrationForm, LoginForm
+import re
 #from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -31,14 +32,20 @@ def about():
     return render_template('about.html', title='About')
 
 
+@app.route("/confirmemail")
+def confirmemail():
+    return render_template('emailconfirmation.html', title='Confirm email')
+
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
-        new_user = {'username' : form.username.data, 'email' :form.email.data, 'password':form.password.data}
-        db_operations.insert_one(new_user)
-        return redirect(url_for('home'))
+        if re.search('[a-zA-Z0-9]*@amazingbrands.group', form.email.data):
+            flash(f'Account created for {form.username.data}!', 'success')
+            new_user = {'username' : form.username.data, 'email' :form.email.data, 'password':form.password.data}
+            db_operations.insert_one(new_user)
+            return redirect(url_for('confirmemail'))
     return render_template('register.html', title='Register', form=form)
 
 
