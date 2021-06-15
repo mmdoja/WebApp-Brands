@@ -1,8 +1,8 @@
 from bson import ObjectId
 from flask import render_template, url_for, flash, redirect, request
 from webappbackend import app, mongo, bcrypt, db_operations, lm
-from webappbackend.forms import RegistrationForm, LoginForm
-from webappbackend.token import generate_confirmation_token
+from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
+from webappbackend.token import generate_confirmation_token, generate_password_reset_token, confirm_token
 import re
 from .user import User
 from .email import send_email
@@ -95,3 +95,40 @@ def logout():
 @login_required
 def account():
     return render_template('account.html', title='Account')
+
+
+@app.route("/reset_password", methods=['GET', 'POST'])
+def reset_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = db_operations.find_one({
+            "email": form.email.data
+        })
+        token = generate_password_reset_token(form.email.data)
+        confirm_url = url_for('reset_token', token=token, _external=True)
+        html = render_template('password_reset.html', confirm_url=confirm_url)
+        subject = "Password Reset"
+        send_email(form.email.data, subject, html)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('login'))
+    return render_template('reset_request.html', title='Reset Password', form=form)
+
+
+@app.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    email = confirm_token(token)
+    user = db_operations.find_one({
+        "email": email
+    })
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        filt = {"$set": {'password': hashed_password}}
+        db_operations.update_one(user, filt)
+        flash('Your password has been updated! You are now able to log in', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_token.html', title='Reset Password', form=form)
