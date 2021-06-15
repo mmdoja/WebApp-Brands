@@ -74,7 +74,7 @@ def login():
         user = db_operations.find_one({
             "email": form.email.data
         })
-        if user['email']==form.email.data and user['password']==form.password.data:
+        if bcrypt.check_password_hash(user['password'], form.password.data):
             flash('You have been logged in!', 'success')
             return redirect(url_for('home'))
         else:
