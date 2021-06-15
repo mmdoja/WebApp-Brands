@@ -7,7 +7,6 @@ class User():
         self.username = username
         self.email = None
         self.password = None
-        self.confirmed = False
 
     def is_authenticated(self):
         return True
