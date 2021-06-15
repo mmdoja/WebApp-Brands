@@ -1,11 +1,12 @@
+from bson import ObjectId
 from flask import render_template, url_for, flash, redirect, request
 from webappbackend import app, mongo, bcrypt, db_operations, lm
 from webappbackend.forms import RegistrationForm, LoginForm
-from webappbackend.token import generate_confirmation_token, confirm_token
+from webappbackend.token import generate_confirmation_token
 import re
 from .user import User
 from .email import send_email
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user, logout_user
 
 
 posts = [
@@ -34,9 +35,11 @@ def home():
 def about():
     return render_template('about.html', title='About')
 
-
-@app.route("/session/signup", methods=['GET', 'POST'])
+#register route
+@app.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         if re.search('[a-zA-Z0-9]*@amazingbrands.group', form.email.data):
@@ -53,18 +56,17 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 @lm.user_loader
-def load_user(username):
-    u = db_operations.find_one({"_id": username})
-    if not u:
-        return None
-    return User(u['_id'])
+def load_user(user_id):
+    #users = mongo.db.users
+    user_json = db_operations.find_one({'_id': ObjectId(user_id)})
+    return User(user_json)
 
 @app.route('/confirm/<token>')
 @login_required
 def confirm_email(token):
     return url_for('login')
 
-
+#login route
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -74,9 +76,22 @@ def login():
         user = db_operations.find_one({
             "email": form.email.data
         })
-        if bcrypt.check_password_hash(user['password'], form.password.data):
+        if user and bcrypt.check_password_hash(user['password'], form.password.data):
             flash('You have been logged in!', 'success')
-            return redirect(url_for('home'))
+            login_user(User(user))
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
+            flash('Login Unsuccessful. Please check email id and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route("/account")
+@login_required
+def account():
+    return render_template('account.html', title='Account')

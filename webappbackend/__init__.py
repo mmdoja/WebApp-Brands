@@ -18,6 +18,7 @@ bcrypt = Bcrypt(app)
 lm = LoginManager()
 lm.init_app(app)
 lm.login_view = 'login'
+lm.login_message_category = 'info'
 
 # mail settings
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
