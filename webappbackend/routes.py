@@ -1,7 +1,7 @@
 from bson import ObjectId
-from flask import render_template, url_for, flash, redirect, request
-from webappbackend import app, mongo, bcrypt, db_operations, lm
-from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
+from flask import render_template, url_for, flash, redirect, request, session
+from webappbackend import app, bcrypt, db_operations, lm
+from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm
 from webappbackend.token import generate_confirmation_token, generate_password_reset_token, confirm_token
 import re
 from .user import User
@@ -46,6 +46,9 @@ def register():
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             new_user = {'username': form.username.data, 'email': form.email.data, 'password': hashed_password}
             db_operations.insert_one(new_user)
+            db_operations.update(
+                new_user, { "$set": {'confirmed': False}}
+            )
             token = generate_confirmation_token(form.email.data)
             confirm_url = url_for('confirm_email', token=token, _external=True)
             html = render_template('activate.html', confirm_url=confirm_url)
@@ -57,14 +60,21 @@ def register():
 
 @lm.user_loader
 def load_user(user_id):
-    #users = mongo.db.users
     user_json = db_operations.find_one({'_id': ObjectId(user_id)})
     return User(user_json)
 
-@app.route('/confirm/<token>')
-@login_required
+@app.route("/confirm/<token>")
 def confirm_email(token):
-    return url_for('login')
+    email = confirm_token(token)
+    user = db_operations.find_one({
+        "email": email
+    })
+    db_operations.update(
+        user, {"$set": {'confirmed': True}}
+    )
+    flash('Your account has been confirmed. Please login', 'success')
+    return redirect(url_for('login'))
+
 
 #login route
 @app.route("/login", methods=['GET', 'POST'])
@@ -76,7 +86,7 @@ def login():
         user = db_operations.find_one({
             "email": form.email.data
         })
-        if user and bcrypt.check_password_hash(user['password'], form.password.data):
+        if user and bcrypt.check_password_hash(user['password'], form.password.data) and user['confirmed'] is True:
             flash('You have been logged in!', 'success')
             login_user(User(user))
             next_page = request.args.get('next')
@@ -85,16 +95,12 @@ def login():
             flash('Login Unsuccessful. Please check email id and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
-@app.route("/account")
-@login_required
-def account():
-    return render_template('account.html', title='Account')
 
 
 @app.route("/reset_password", methods=['GET', 'POST'])
@@ -103,9 +109,6 @@ def reset_request():
         return redirect(url_for('home'))
     form = RequestResetForm()
     if form.validate_on_submit():
-        user = db_operations.find_one({
-            "email": form.email.data
-        })
         token = generate_password_reset_token(form.email.data)
         confirm_url = url_for('reset_token', token=token, _external=True)
         html = render_template('password_reset.html', confirm_url=confirm_url)
@@ -131,4 +134,22 @@ def reset_token(token):
         db_operations.update_one(user, filt)
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('login'))
-    return render_template('reset_token.html', title='Reset Password', form=form)
+    return render_template('reset_password.html', title='Reset Password', form=form)
+
+
+@app.route("/account", methods=['GET', 'POST'])
+@login_required
+def account():
+    user = db_operations.find_one({
+            "_id": ObjectId(session['_user_id'])
+        })
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        filt = {"$set": {'username': form.username.data, 'email': form.email.data}}
+        db_operations.update_one(user, filt)
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = user['username']
+        form.email.data = user['email']
+    return render_template('account.html', user=user, title='Account', form=form)
