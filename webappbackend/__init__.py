@@ -13,7 +13,9 @@ app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SECURITY_PASSWORD_SALT'] = 'abc123'
 
 mongo = PyMongo(app)
-db_operations = mongo.db.users
+db_users = mongo.db.users
+db_queries = mongo.db.queries
+db_brands = mongo.db.brands
 bcrypt = Bcrypt(app)
 lm = LoginManager()
 lm.init_app(app)
