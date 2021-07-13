@@ -81,9 +81,9 @@ class UpdateAccountForm(FlaskForm):
 
 
 class QueryForm(FlaskForm):
-    brand = StringField('Brand', validators=[DataRequired(), Length(min=2, max=20)])
+    brand = StringField('Brand', validators=[DataRequired(), Length(min=2, max=50)])
 
-    product_name = StringField('Product Name', validators=[DataRequired(), Length(min=2, max=20)])
+    product_name = StringField('Product Name', validators=[DataRequired(), Length(min=2, max=50)])
 
     max_pages = IntegerField('Max Pages')
 
@@ -125,3 +125,7 @@ class QueryForm(FlaskForm):
 class AddBrandName(FlaskForm):
     brand = StringField('Brand Name', validators=[DataRequired()])
     submit = SubmitField('Create Job')
+
+
+class RunScraper(FlaskForm):
+    submit = SubmitField('Scrape')

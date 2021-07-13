@@ -1,8 +1,14 @@
+import json
+import os
+import subprocess
 from datetime import datetime
+
+import requests
 from bson import ObjectId
 from flask import render_template, url_for, flash, redirect, request, session, jsonify
 from webappbackend import app, bcrypt, db_users, lm, db_queries, db_brands
-from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm
+from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm, \
+    RunScraper
 from webappbackend.forms import QueryForm, AddBrandName
 from webappbackend.token import generate_confirmation_token, generate_password_reset_token, confirm_token
 import re
@@ -179,11 +185,11 @@ def query():
             'ES': [form.keyword_ES.data],
         }
         asins = {
-            'DE': [form.keyword_DE.data],
-            'UK': [form.keyword_UK.data],
-            'FR': [form.keyword_FR.data],
-            'IT': [form.keyword_IT.data],
-            'ES': [form.keyword_ES.data],
+            'DE': [form.asins_DE.data],
+            'UK': [form.asins_UK.data],
+            'FR': [form.asins_FR.data],
+            'IT': [form.asins_IT.data],
+            'ES': [form.asins_ES.data],
         }
         reviews_seller = {
             'DE': form.reviews_seller_DE.data,
@@ -223,6 +229,8 @@ def query():
             'queries': product
         }
         print(del_none(complete_query))
+        with open("queries/query.hjson", "w") as fo:
+            fo.write(str(del_none(complete_query)))
         db_queries.insert_one(del_none(complete_query))
         flash('Query created', 'success')
         return redirect(url_for('query'))
@@ -237,7 +245,7 @@ def create_job():
     if form.validate_on_submit():
         db_brands.insert_one(brand)
         flash('Job Created', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('jobs'))
     return render_template('add_brand.html', title='Create Job', form=form)
 
 
@@ -249,6 +257,9 @@ def jobs():
             {"$sort": {'date': -1}}
         ]
     )
+    form = RunScraper()
+    if form.validate_on_submit():
+        print('Scraper running clicked')
     for document in cursor:
         print(document)
-    return render_template('jobs.html', title='Jobs')
+    return render_template('jobs.html', title='Jobs', form=form)

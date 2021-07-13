@@ -1,9 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
-        <article class="media content-section">
-            <div class="media-body">
-            <h2 class="account-heading">{{ brand }}</h2>
-            <p class="text-secondary">{{ date }}</p>
-        </div>
-        </article>
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Scrape Data</legend>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
 {% endblock content %}
