@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 import subprocess
 from datetime import datetime
 
@@ -260,7 +261,9 @@ def jobs():
     form = RunScraper()
     if form.validate_on_submit():
         print('Scraper running clicked')
-        subprocess.call(['sh','./test.sh'])
+        filename = "query_Nordictest.hjson"
+        subprocess.run('cd .. && cd helium-scraper && python3 HeliumScraper.py %s'%filename,
+                       shell=True, universal_newlines=True)
     for document in cursor:
         print(document)
     return render_template('jobs.html', title='Jobs', form=form)
