@@ -260,6 +260,7 @@ def jobs():
     form = RunScraper()
     if form.validate_on_submit():
         print('Scraper running clicked')
+        subprocess.call(['sh','./test.sh'])
     for document in cursor:
         print(document)
     return render_template('jobs.html', title='Jobs', form=form)
