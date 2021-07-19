@@ -267,3 +267,17 @@ def jobs():
     for document in cursor:
         print(document)
     return render_template('jobs.html', title='Jobs', form=form)
+
+
+@app.route("/queries", methods=['GET', 'POST'])
+@login_required
+def queries():
+    brand = 'Nordic'
+    cursor = db_queries.find({
+        'brand': brand
+    })
+    for document in cursor:
+        print(document)
+    return render_template('home.html', title='Queries')
+
+
