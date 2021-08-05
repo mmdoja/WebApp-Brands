@@ -2,6 +2,7 @@ import json
 import os
 import shlex
 import subprocess
+import sys
 from datetime import datetime
 
 import requests
@@ -166,7 +167,7 @@ def account():
 
 def del_none(query):
     for key, value in list(query.items()):
-        if value is None or value == "" or value == [""]:
+        if value is None or value == "" or value == [""] or value == 0:
             del query[key]
         elif isinstance(value, dict):
             del_none(value)
@@ -281,3 +282,59 @@ def queries():
     return render_template('home.html', title='Queries')
 
 
+@app.route('/check')
+def index():
+    return render_template('newQueryfile.html')
+
+
+@app.route("/postskill",methods=["POST","GET"])
+def postskill():
+    if request.method == 'POST':
+        brandName = request.form.get('brandName')
+        productName = request.form.getlist('productName[]')
+        maxPages = request.form.getlist('maxPages[]')
+        keyword = request.form.getlist('keyword[]')
+        asinsnum = request.form.getlist('asins[]')
+        review = request.form.getlist('review[]')
+        price = request.form.getlist('price[]')
+        rating = request.form.getlist('rating[]')
+        msg = 'New query created successfully'
+        flag = 0
+        product = {}
+        while(flag<len(productName)):
+            keywords = {
+                'DE': [keyword[flag]],
+            }
+            asins = {
+                'DE': [asinsnum[flag]],
+            }
+            reviews_seller = {
+                'DE': float(review[flag].strip() or 0.0),
+            }
+            price_seller = {
+                'DE': float(price[flag].strip() or 0.0),
+            }
+            rating_seller = {
+                'DE': float(rating[flag].strip() or 0.0),
+            }
+            query_1 = {
+                'max_pages': float(maxPages[flag].strip() or 0.0),
+                'keywords': keywords,
+                'asins': asins,
+                'reviews_seller': reviews_seller,
+                'price_seller': price_seller,
+                'rating_seller': rating_seller
+            }
+            product.update({
+                productName[flag]: query_1
+            })
+            complete_query = {
+                'brand': brandName,
+                'queries': product
+            }
+            flag=flag+1
+        print(del_none(complete_query))
+        with open("queries/query.hjson", "w") as fo:
+            fo.write(str(del_none(complete_query)))
+        db_queries.insert_one(del_none(complete_query))
+        return jsonify(msg)

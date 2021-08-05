@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queries</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<script>
+$(document).ready(function() {
+
+var MaxInputs       = 50; //maximum input boxes allowed
+var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID
+var AddButton       = $("#AddMoreFileBox"); //Add button ID
+
+var productName = '<p class="col-xs-3"><input type="text" placeholder="Add Product Name" class="form-control product_list" name="productName[]" id="field_'+ FieldCount +'"/></p>'
+var maxPages = '<p class="col-xs-3"><input type="number" placeholder="Add Max Pages" class="form-control maxPages_list" name="maxPages[]" id="field_'+ FieldCount +'"/></p>'
+var keyword = '<p class="col-xs-3"><input type="text" placeholder="Add Keyword" class="form-control keyword_list" name="keyword[]" id="field_'+ FieldCount +'"/></p>'
+var asins = '<p class="col-xs-3"><input type="text" placeholder="Add Asins" class="form-control asins_list" name="asins[]" id="field_'+ FieldCount +'"/></p>'
+var review = '<p class="col-xs-3"><input type="number" placeholder="Add Review" class="form-control review_list" name="review[]" id="field_'+ FieldCount +'"/></p>'
+var price = '<p class="col-xs-3"><input type="number" placeholder="Add Price" class="form-control price_list" name="price[]" id="field_'+ FieldCount +'"/></p>'
+var rating = '<p class="col-xs-3"><input type="number" placeholder="Add Rating" class="form-control rating_list" name="rating[]" id="field_'+ FieldCount +'"/></p>'
+var removeButton = '<a href="#" class="btn btn-danger removeclass">×</a>'
+
+var AddMore = '<div class="row">'+productName+maxPages+keyword+asins+review+price+rating+removeButton+'</div>';
+var x = InputsWrapper.length; //initlal text box count
+var FieldCount=1; //to keep track of text box added
+
+$(AddButton).click(function (e)  //on add input button click
+{
+        if(x <= MaxInputs) //max input box allowed
+        {
+            FieldCount++; //text box added increment
+            //add input box
+            $(InputsWrapper).append(AddMore);
+            x=x+2; //text box increment
+        }
+return false;
+});
+
+$("body").on("click",".removeclass", function(e){ //user click on remove text
+        if( x > 1 ) {
+                $(this).parent('div').remove(); //remove text box
+                x--; //decrement textbox
+        }
+return false;
+})
+ $('#submit').click(function(){
+           $.ajax({
+                url:"/postskill",
+                method:"POST",
+                data:$('#add_object').serialize(),
+                success:function(data)
+                {  alert(data)
+                     $('#resultbox').html(data);
+                     $('#add_object')[0].reset();
+                }
+           });
+      });
+});
+</script>
+<style>
+.row {padding:10px;}
+</style>
+<div class="container">
+                <br />
+                <br />
+                <h2 align="center">Queries</h2><div id="resultbox"></div>
+                <div class="form-group">
+                     <form name="add_object" id="add_object">
+                                    <div id="InputsWrapper">
+                                        <div class="row">
+                                         <div class="col-s-6"><p class="col-xs-3"><input type="text" name="brandName" placeholder="Add Brand Name" class="form-control brandName" /></div>
+                                        </div>
+          <div class="row">
+                                         <div class="col-s-6"><p class="col-xs-3"><input type="text" name="productName[]" placeholder="Add Product Name" class="form-control productName_list" /></div>
+                                         <div class="col-s-6"><p class="col-xs-3"><input type="number" name="maxPages[]" placeholder="Add Max Pages" class="form-control maxPages_list" /></div>
+                                          <div class="col-s-6"><p class="col-xs-3"><input type="text" name="keyword[]" placeholder="Add Keyword" class="form-control keyword_list" /></div>
+                                          <div class="col-s-6"><p class="col-xs-3"><input type="text" name="asins[]" placeholder="Add Asins" class="form-control asins_list" /></div>
+                                          <div class="col-s-6"><p class="col-xs-3"><input type="number" name="review[]" placeholder="Add Review" class="form-control review_list" /></div>
+                                          <div class="col-s-6"><p class="col-xs-3"><input type="number" name="price[]" placeholder="Add Price" class="form-control price_list" /></div>
+                                          <div class="col-s-6"><p class="col-xs-3"><input type="number" name="rating[]" placeholder="Add Rating" class="form-control rating_list" /></div>
+                                         <div class="col-s-6"><p class="col-xs-3"><button type="button" name="add" id="AddMoreFileBox" class="btn btn-success">Add More</button></div>
+           </div>
+         </div>
+         <br/>
+                               <input type="button" name="submit" id="submit" class="btn btn-info" value="Submit" />
+                     </form>
+                </div>
+           </div>
+</body>
+</html>
