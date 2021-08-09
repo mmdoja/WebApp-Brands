@@ -293,29 +293,75 @@ def postskill():
         brandName = request.form.get('brandName')
         productName = request.form.getlist('productName[]')
         maxPages = request.form.getlist('maxPages[]')
-        keyword = request.form.getlist('keyword[]')
-        asinsnum = request.form.getlist('asins[]')
-        review = request.form.getlist('review[]')
-        price = request.form.getlist('price[]')
-        rating = request.form.getlist('rating[]')
+
+        keywordDE = request.form.getlist('keywordDE[]')
+        keywordUK = request.form.getlist('keywordUK[]')
+        keywordFR = request.form.getlist('keywordFR[]')
+        keywordIT = request.form.getlist('keywordIT[]')
+        keywordES = request.form.getlist('keywordES[]')
+
+        asinDE = request.form.getlist('asinDE[]')
+        asinUK = request.form.getlist('asinUK[]')
+        asinFR = request.form.getlist('asinFR[]')
+        asinIT = request.form.getlist('asinIT[]')
+        asinES = request.form.getlist('asinES[]')
+
+        reviewDE = request.form.getlist('reviewDE[]')
+        reviewUK = request.form.getlist('reviewUK[]')
+        reviewFR = request.form.getlist('reviewFR[]')
+        reviewIT = request.form.getlist('reviewIT[]')
+        reviewES = request.form.getlist('reviewES[]')
+
+        priceDE = request.form.getlist('priceDE[]')
+        priceUK = request.form.getlist('priceUK[]')
+        priceFR = request.form.getlist('priceFR[]')
+        priceIT = request.form.getlist('priceIT[]')
+        priceES = request.form.getlist('priceES[]')
+
+        ratingDE = request.form.getlist('ratingDE[]')
+        ratingUK = request.form.getlist('ratingUK[]')
+        ratingFR = request.form.getlist('ratingFR[]')
+        ratingIT = request.form.getlist('ratingIT[]')
+        ratingES = request.form.getlist('ratingES[]')
+
         msg = 'New query created successfully'
         flag = 0
         product = {}
         while(flag<len(productName)):
             keywords = {
-                'DE': [keyword[flag]],
+                'DE': [keywordDE[flag]],
+                'UK': [keywordUK[flag]],
+                'FR': [keywordFR[flag]],
+                'IT': [keywordIT[flag]],
+                'ES': [keywordES[flag]],
             }
             asins = {
-                'DE': [asinsnum[flag]],
+                'DE': [asinDE[flag]],
+                'UK': [asinUK[flag]],
+                'FR': [asinFR[flag]],
+                'IT': [asinIT[flag]],
+                'ES': [asinES[flag]],
             }
             reviews_seller = {
-                'DE': float(review[flag].strip() or 0.0),
+                'DE': float(reviewDE[flag].strip() or 0.0),
+                'UK': float(reviewUK[flag].strip() or 0.0),
+                'FR': float(reviewFR[flag].strip() or 0.0),
+                'IT': float(reviewIT[flag].strip() or 0.0),
+                'ES': float(reviewES[flag].strip() or 0.0),
             }
             price_seller = {
-                'DE': float(price[flag].strip() or 0.0),
+                'DE': float(priceDE[flag].strip() or 0.0),
+                'UK': float(priceUK[flag].strip() or 0.0),
+                'FR': float(priceFR[flag].strip() or 0.0),
+                'IT': float(priceIT[flag].strip() or 0.0),
+                'ES': float(priceES[flag].strip() or 0.0),
             }
             rating_seller = {
-                'DE': float(rating[flag].strip() or 0.0),
+                'DE': float(ratingDE[flag].strip() or 0.0),
+                'UK': float(ratingUK[flag].strip() or 0.0),
+                'FR': float(ratingFR[flag].strip() or 0.0),
+                'IT': float(ratingIT[flag].strip() or 0.0),
+                'ES': float(ratingES[flag].strip() or 0.0),
             }
             query_1 = {
                 'max_pages': float(maxPages[flag].strip() or 0.0),
