@@ -80,7 +80,7 @@ class UpdateAccountForm(FlaskForm):
             raise ValidationError('That email is taken. Please choose a different one.')
 
 
-class QueryForm(FlaskForm):
+'''ssclass QueryForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired(), Length(min=2, max=50)])
 
     product_name = StringField('Product Name', validators=[DataRequired(), Length(min=2, max=50)])
@@ -120,7 +120,7 @@ class QueryForm(FlaskForm):
     rating_seller_ES = FloatField('Seller Rating ES', validators=[Optional()])
 
     submit = SubmitField('Send')
-
+'''
 
 class AddBrandName(FlaskForm):
     brand = StringField('Brand Name', validators=[DataRequired()])

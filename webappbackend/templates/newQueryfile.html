@@ -83,7 +83,7 @@ return false;
 })
  $('#submit').click(function(){
            $.ajax({
-                url:"/postskill",
+                url:"/forms/query",
                 method:"POST",
                 data:$('#add_object').serialize(),
                 success:function(data)

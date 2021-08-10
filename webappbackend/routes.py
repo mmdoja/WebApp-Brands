@@ -11,7 +11,7 @@ from flask import render_template, url_for, flash, redirect, request, session, j
 from webappbackend import app, bcrypt, db_users, lm, db_queries, db_brands
 from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm, \
     RunScraper
-from webappbackend.forms import QueryForm, AddBrandName
+from webappbackend.forms import AddBrandName
 from webappbackend.token import generate_confirmation_token, generate_password_reset_token, confirm_token
 import re
 from .user import User
@@ -174,7 +174,7 @@ def del_none(query):
     return query
 
 
-@app.route("/forms/query", methods=['GET', 'POST'])
+'''@app.route("/forms/query", methods=['GET', 'POST'])
 @login_required
 def query():
     form = QueryForm()
@@ -236,7 +236,7 @@ def query():
         db_queries.insert_one(del_none(complete_query))
         flash('Query created', 'success')
         return redirect(url_for('query'))
-    return render_template('query.html', title='Query', form=form)
+    return render_template('query.html', title='Query', form=form)'''
 
 
 @app.route("/forms/job", methods=['GET', 'POST'])
@@ -287,8 +287,8 @@ def index():
     return render_template('newQueryfile.html')
 
 
-@app.route("/postskill",methods=["POST","GET"])
-def postskill():
+@app.route("/forms/query", methods=["POST", "GET"])
+def query():
     if request.method == 'POST':
         brandName = request.form.get('brandName')
         productName = request.form.getlist('productName[]')
