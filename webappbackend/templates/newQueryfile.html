@@ -83,7 +83,7 @@ return false;
 })
  $('#submit').click(function(){
            $.ajax({
-                url:"/forms/query",
+                url:"/submitQuery",
                 method:"POST",
                 data:$('#add_object').serialize(),
                 success:function(data)

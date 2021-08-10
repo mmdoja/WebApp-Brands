@@ -282,12 +282,12 @@ def queries():
     return render_template('home.html', title='Queries')
 
 
-@app.route('/check')
+@app.route('/forms/query')
 def index():
     return render_template('newQueryfile.html')
 
 
-@app.route("/forms/query", methods=["POST", "GET"])
+@app.route("/submitQuery", methods=["POST", "GET"])
 def query():
     if request.method == 'POST':
         brandName = request.form.get('brandName')
