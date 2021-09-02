@@ -5,7 +5,6 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
 load_dotenv()
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://munir:12345@cluster0.mizkt.mongodb.net/webapp?retryWrites=true&w=majority"
