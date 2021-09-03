@@ -1,11 +1,5 @@
-import json
-import os
-import shlex
 import subprocess
-import sys
 from datetime import datetime
-
-import requests
 from bson import ObjectId
 from flask import render_template, url_for, flash, redirect, request, session, jsonify
 from webappbackend import app, bcrypt, db_users, lm, db_queries, db_brands
@@ -30,6 +24,24 @@ posts = [
         'name': 'Mohammad Munirud Doja',
         'position': 'Software Developer',
         'content': 'Second post content',
+        'date_posted': 'April 21, 2018'
+    },
+{
+        'name': 'Zakir',
+        'position': 'Software Developer',
+        'content': 'Third post content',
+        'date_posted': 'April 21, 2018'
+    },
+{
+        'name': 'Divyanshu',
+        'position': 'Data Scientist',
+        'content': 'Fourth post content',
+        'date_posted': 'April 21, 2018'
+    },
+{
+        'name': 'Nadezda',
+        'position': 'Data Scientist',
+        'content': 'Fifth post content',
         'date_posted': 'April 21, 2018'
     }
 ]
@@ -100,10 +112,11 @@ def login():
             flash('You have been logged in!', 'success')
             login_user(User(user))
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
+            return redirect(next_page) if next_page else redirect(url_for('jobs'))
         else:
             flash('Login Unsuccessful. Please check email id and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
 
 #logout route
 @app.route("/logout")
@@ -174,71 +187,6 @@ def del_none(query):
     return query
 
 
-'''@app.route("/forms/query", methods=['GET', 'POST'])
-@login_required
-def query():
-    form = QueryForm()
-    if form.validate_on_submit():
-        keywords = {
-            'DE': [form.keyword_DE.data],
-            'UK': [form.keyword_UK.data],
-            'FR': [form.keyword_FR.data],
-            'IT': [form.keyword_IT.data],
-            'ES': [form.keyword_ES.data],
-        }
-        asins = {
-            'DE': [form.asins_DE.data],
-            'UK': [form.asins_UK.data],
-            'FR': [form.asins_FR.data],
-            'IT': [form.asins_IT.data],
-            'ES': [form.asins_ES.data],
-        }
-        reviews_seller = {
-            'DE': form.reviews_seller_DE.data,
-            'UK': form.reviews_seller_UK.data,
-            'FR': form.reviews_seller_FR.data,
-            'IT': form.reviews_seller_IT.data,
-            'ES': form.reviews_seller_ES.data,
-        }
-        price_seller = {
-            'DE': form.price_seller_DE.data,
-            'UK': form.price_seller_UK.data,
-            'FR': form.price_seller_FR.data,
-            'IT': form.price_seller_IT.data,
-            'ES': form.price_seller_ES.data,
-        }
-        rating_seller = {
-            'DE': form.rating_seller_DE.data,
-            'UK': form.rating_seller_UK.data,
-            'FR': form.rating_seller_FR.data,
-            'IT': form.rating_seller_IT.data,
-            'ES': form.rating_seller_ES.data,
-        }
-        query_1 = {
-            'max_pages': form.max_pages.data,
-            'source': form.source.data,
-            'keywords': keywords,
-            'asins': asins,
-            'reviews_seller': reviews_seller,
-            'price_seller': price_seller,
-            'rating_seller': rating_seller
-        }
-        product = {
-            form.product_name.data: query_1
-        }
-        complete_query = {
-            'brand': form.brand.data,
-            'queries': product
-        }
-        print(del_none(complete_query))
-        with open("queries/query.hjson", "w") as fo:
-            fo.write(str(del_none(complete_query)))
-        db_queries.insert_one(del_none(complete_query))
-        flash('Query created', 'success')
-        return redirect(url_for('query'))
-    return render_template('query.html', title='Query', form=form)'''
-
-
 @app.route("/forms/job", methods=['GET', 'POST'])
 @login_required
 def create_job():
@@ -266,8 +214,9 @@ def jobs():
         subprocess.run('cd .. && cd helium-scraper && python3 HeliumScraper.py %s'%filename,
                        shell=True, universal_newlines=True)
     for document in cursor:
-        print(document)
-    return render_template('jobs.html', title='Jobs', form=form)
+        print(document.get('brand'))
+        print(document.get('date'))
+    return render_template('jobs.html', title='Jobs', form=form, cursor=cursor)
 
 
 @app.route("/queries", methods=['GET', 'POST'])
@@ -278,13 +227,13 @@ def queries():
         'brand': brand
     })
     for document in cursor:
-        print(document)
+        print(document.get('brand'))
     return render_template('home.html', title='Queries')
 
 
 @app.route('/forms/query')
-def index():
-    return render_template('newQueryfile.html')
+def query_page():
+    return render_template('newQueryFile.html')
 
 
 @app.route("/submitQuery", methods=["POST", "GET"])
@@ -380,7 +329,12 @@ def query():
             }
             flag=flag+1
         print(del_none(complete_query))
-        with open("queries/query.hjson", "w") as fo:
+        with open(f"queries/query_{brandName}.hjson", "w+") as fo:
             fo.write(str(del_none(complete_query)))
         db_queries.insert_one(del_none(complete_query))
         return jsonify(msg)
+
+
+@app.route('/test')
+def test():
+    return render_template('test.html')

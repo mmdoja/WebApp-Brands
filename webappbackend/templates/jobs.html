@@ -1,14 +1,70 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="content-section">
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Scrape Data</legend>
-            </fieldset>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
-            </div>
-        </form>
-    </div>
+<div class="content-section">
+   <form method="POST" action="">
+      {{ form.hidden_tag() }}
+      <table class="table table-striped">
+         <thead>
+            <tr>
+               <th scope="col">Brand Name</th>
+               <th scope="col">Creation Date</th>
+               <th scope="col">Queries</th>
+               <th scope="col">Helium Data</th>
+               <th scope="col">Matching</th>
+               <th scope="col">Potential</th>
+               <th scope="col">Status</th>
+               <th scope="col">CSV</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <th scope="row">Hennez</td>
+               <td>10.08.2021</td>
+               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
+               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
+               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
+               <td><button type="button" name="add" id="AddMoreFileBox" class="btn btn-outline-dark">Run</button></td>
+               <td><span class="badge badge-success">Success</span></td>
+            </tr>
+            <tr>
+               <th scope="row">Basil</th>
+               <td>10.08.2021</td>
+               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
+               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
+               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
+               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
+               <td><span class="badge badge-danger">Error</span></td>
+            </tr>
+            <tr>
+               <th scope="row">Nordic</th>
+               <td>15.08.2021</td>
+               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
+               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
+               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
+               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
+               <td></td>
+            </tr>
+            <tr>
+               <th scope="row">Lyvanas</th>
+               <td>15.08.2021</td>
+               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
+               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
+               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
+               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
+               <td><span class="badge badge-success">Success</span></td>
+            </tr>
+            <tr>
+               <th scope="row">MyIdeaz</th>
+               <td>15.08.2021</td>
+               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
+               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
+               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
+               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
+               <td><span class="badge badge-warning">Warning</span></td>
+            </tr>
+         </tbody>
+      </table>
+   </form>
+</div>
 {% endblock content %}
+
