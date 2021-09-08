@@ -1,4 +1,5 @@
 import subprocess
+from time import time
 from datetime import datetime
 from bson import ObjectId
 from flask import render_template, url_for, flash, redirect, request, session, jsonify
@@ -278,18 +279,18 @@ def query():
         product = {}
         while(flag<len(productName)):
             keywords = {
-                'DE': [keywordDE[flag]],
-                'UK': [keywordUK[flag]],
-                'FR': [keywordFR[flag]],
-                'IT': [keywordIT[flag]],
-                'ES': [keywordES[flag]],
+                'DE': [x.strip() for x in keywordDE[flag].split(',')],
+                'UK': [x.strip() for x in keywordUK[flag].split(',')],
+                'FR': [x.strip() for x in keywordFR[flag].split(',')],
+                'IT': [x.strip() for x in keywordIT[flag].split(',')],
+                'ES': [x.strip() for x in keywordES[flag].split(',')],
             }
             asins = {
-                'DE': [asinDE[flag]],
-                'UK': [asinUK[flag]],
-                'FR': [asinFR[flag]],
-                'IT': [asinIT[flag]],
-                'ES': [asinES[flag]],
+                'DE': [x.strip() for x in asinDE[flag].split(',')],
+                'UK': [x.strip() for x in asinUK[flag].split(',')],
+                'FR': [x.strip() for x in asinFR[flag].split(',')],
+                'IT': [x.strip() for x in asinIT[flag].split(',')],
+                'ES': [x.strip() for x in asinES[flag].split(',')],
             }
             reviews_seller = {
                 'DE': float(reviewDE[flag].strip() or 0.0),
@@ -329,7 +330,9 @@ def query():
             }
             flag=flag+1
         print(del_none(complete_query))
-        with open(f"queries/query_{brandName}.hjson", "w+") as fo:
+        timestamp = int(time())
+        filename = f"query_{brandName}_{timestamp}"
+        with open(f"queries/{filename}.hjson", "w+") as fo:
             fo.write(str(del_none(complete_query)))
         db_queries.insert_one(del_none(complete_query))
         return jsonify(msg)
