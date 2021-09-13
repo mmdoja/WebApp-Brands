@@ -1,0 +1,33 @@
+{
+   "brand":"CAMIUM",
+   "queries":{
+      "Fleischklopfer":{
+         "max_pages":1.0,
+         "keywords":{
+            "DE":[
+               "Fleischklopfer",
+               "Fleischhammer"
+            ],
+            "UK":[
+               "Stainless Steel Meat Tenderizer",
+               "Meat Tenderiser Hammer"
+            ]
+         },
+         "asins":{
+            "DE":[
+               "B07PY4ZH3J"
+            ]
+         },
+         "reviews_seller":{
+            "DE":302.0
+         },
+         "price_seller":{
+            "DE":15.95
+         },
+         "rating_seller":{
+            "DE":4.5,
+            "UK":4.5
+         }
+      }
+   }
+}

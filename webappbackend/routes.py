@@ -1,8 +1,9 @@
 import subprocess
+from os import abort
 from time import time
 from datetime import datetime
 from bson import ObjectId
-from flask import render_template, url_for, flash, redirect, request, session, jsonify
+from flask import render_template, url_for, flash, redirect, request, session, jsonify, send_from_directory
 from webappbackend import app, bcrypt, db_users, lm, db_queries, db_brands
 from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm, \
     RunScraper
@@ -12,6 +13,10 @@ import re
 from .user import User
 from .email import send_email
 from flask_login import login_required, current_user, login_user, logout_user
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 posts = [
@@ -208,28 +213,17 @@ def jobs():
             {"$sort": {'date': -1}}
         ]
     )
+    item=[]
+    for document in cursor:
+        an_item = dict(brand=document.get('brand'), date=document.get('date'))
+        item.append(an_item)
     form = RunScraper()
     if form.validate_on_submit():
         print('Scraper running clicked')
         filename = "query_Nordictest.hjson"
         subprocess.run('cd .. && cd helium-scraper && python3 HeliumScraper.py %s'%filename,
                        shell=True, universal_newlines=True)
-    for document in cursor:
-        print(document.get('brand'))
-        print(document.get('date'))
-    return render_template('jobs.html', title='Jobs', form=form, cursor=cursor)
-
-
-@app.route("/queries", methods=['GET', 'POST'])
-@login_required
-def queries():
-    brand = 'Nordic'
-    cursor = db_queries.find({
-        'brand': brand
-    })
-    for document in cursor:
-        print(document.get('brand'))
-    return render_template('home.html', title='Queries')
+    return render_template('jobs.html', title='Jobs', form=form, item=item)
 
 
 @app.route('/forms/query')
@@ -332,12 +326,36 @@ def query():
         print(del_none(complete_query))
         timestamp = int(time())
         filename = f"query_{brandName}_{timestamp}"
-        with open(f"queries/{filename}.hjson", "w+") as fo:
+        with open(f"webappbackend/static/queries/{filename}.hjson", "w+") as fo:
             fo.write(str(del_none(complete_query)))
         db_queries.insert_one(del_none(complete_query))
         return jsonify(msg)
 
 
+@app.route('/downloadfile')
+def download_file():
+    brand = 'Nordic'
+    cursor = db_queries.find({
+        'brand': brand
+    })
+    for document in cursor:
+        print(document)
+        with open(f"queries/test.csv", 'w+') as f:
+            f.write(str(document))
+    return redirect(url_for('jobs'))
+
+'''
+DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp-backend/webappbackend/static/queries"
+@app.route('/get-files/<path>',methods = ['GET','POST'])
+def get_files(path):
+    """Download a file."""
+    try:
+        return send_from_directory(DOWNLOAD_DIRECTORY, path, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
+'''
+
 @app.route('/test')
 def test():
     return render_template('test.html')
+

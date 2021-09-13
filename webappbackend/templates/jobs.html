@@ -3,8 +3,8 @@
 <div class="content-section">
    <form method="POST" action="">
       {{ form.hidden_tag() }}
-      <table class="table table-striped">
-         <thead>
+      <table class="table table-hover" id="rankings-table">
+         <thead class="thead-dark">
             <tr>
                <th scope="col">Brand Name</th>
                <th scope="col">Creation Date</th>
@@ -17,51 +17,18 @@
             </tr>
          </thead>
          <tbody>
+            {% for item in item %}
             <tr>
-               <th scope="row">Hennez</td>
-               <td>10.08.2021</td>
+               <td class="highlight">{{item.brand}}</td>
+               <td>{{item.date}}</td>
                <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
                <td>{{ form.submit(class="btn btn-outline-info") }}</td>
                <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
                <td><button type="button" name="add" id="AddMoreFileBox" class="btn btn-outline-dark">Run</button></td>
-               <td><span class="badge badge-success">Success</span></td>
+               <td><span class="badge badge-success">Unknown</span></td>
+               <td><a href="{{ url_for('download_file')}}"><button type="button" class="btn btn-outline-info">Download</button></a></td>
             </tr>
-            <tr>
-               <th scope="row">Basil</th>
-               <td>10.08.2021</td>
-               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
-               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
-               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
-               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
-               <td><span class="badge badge-danger">Error</span></td>
-            </tr>
-            <tr>
-               <th scope="row">Nordic</th>
-               <td>15.08.2021</td>
-               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
-               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
-               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
-               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
-               <td></td>
-            </tr>
-            <tr>
-               <th scope="row">Lyvanas</th>
-               <td>15.08.2021</td>
-               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
-               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
-               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
-               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
-               <td><span class="badge badge-success">Success</span></td>
-            </tr>
-            <tr>
-               <th scope="row">MyIdeaz</th>
-               <td>15.08.2021</td>
-               <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
-               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
-               <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
-               <td><button type="button" name="potential" id="potential" class="btn btn-outline-dark">Run</button></td>
-               <td><span class="badge badge-warning">Warning</span></td>
-            </tr>
+            {% endfor %}
          </tbody>
       </table>
    </form>
