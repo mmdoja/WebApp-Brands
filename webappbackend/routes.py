@@ -22,30 +22,35 @@ if __name__ == '__main__':
 posts = [
     {
         'name': 'Janik Euskirchen',
+        'linkedin': 'https://www.linkedin.com/in/janikeuskirchen/',
         'position': 'Data Scientist and Software Developer',
         'content': 'First post content',
         'date_posted': 'April 20, 2018'
     },
     {
         'name': 'Mohammad Munirud Doja',
+        'linkedin': 'https://www.linkedin.com/in/mohammadmuniruddoja/',
         'position': 'Software Developer',
         'content': 'Second post content',
         'date_posted': 'April 21, 2018'
     },
 {
-        'name': 'Zakir',
+        'name': 'Zakir Ayub Bhuiyan',
+        'linkedin': 'https://www.linkedin.com/in/zakir-tushar/',
         'position': 'Software Developer',
         'content': 'Third post content',
         'date_posted': 'April 21, 2018'
     },
 {
-        'name': 'Divyanshu',
+        'name': 'Divyanshu Katiyar',
+        'linkedin': 'https://www.linkedin.com/in/divyanshu-katiyar-45ba03131/',
         'position': 'Data Scientist',
         'content': 'Fourth post content',
         'date_posted': 'April 21, 2018'
     },
 {
-        'name': 'Nadezda',
+        'name': 'Nadezda Tyulneva',
+        'linkedin': 'https://www.linkedin.com/in/nadezda-tyulneva-85057315b/',
         'position': 'Data Scientist',
         'content': 'Fifth post content',
         'date_posted': 'April 21, 2018'
