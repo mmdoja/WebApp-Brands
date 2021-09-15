@@ -225,8 +225,8 @@ def jobs():
     form = RunScraper()
     if form.validate_on_submit():
         print('Scraper running clicked')
-        filename = "query_Nordictest.hjson"
-        subprocess.run('cd .. && cd helium-scraper && python3 HeliumScraper.py %s'%filename,
+        filename = "query_Swingfit.hjson"
+        subprocess.run('cd .. && cd marketplace-analysis && python3 Scraper.py %s'%filename,
                        shell=True, universal_newlines=True)
     return render_template('jobs.html', title='Jobs', form=form, item=item)
 
