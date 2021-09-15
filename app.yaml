@@ -17,7 +17,8 @@ handlers:
   secure: always
   
 - url: /.*  
-  script: main.app  
+  script: main.app
+  secure: always
 
 runtime: python
 env: flex
