@@ -232,6 +232,7 @@ def jobs():
 
 
 @app.route('/forms/query')
+@login_required
 def query_page():
     return render_template('newQueryFile.html')
 
