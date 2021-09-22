@@ -1,71 +1,60 @@
-{% include "admin-layout.html" %}
-{% block content %}
-<html>
-   <head>
-      <title>Queries</title>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-   </head>
-   <body>
-      <style>
+{% include 'admin-layout.html' %}
 
-      </style>
-      <script>
+        <script>
          $(document).ready(function() {
-         
+
          var MaxInputs       = 50; //maximum input boxes allowed
          var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID
          var AddButton       = $("#AddMoreFileBox"); //Add button ID
-         
+
          var productName = '<p class="col-s-3"><input type="text" placeholder="Add Product Name" class="form-control product_list" name="productName[]" id="field_'+ FieldCount +'"/></p>'
-         
+
          var maxPages = '<p class="col-s-3"><input type="number" placeholder="Add Max Pages" class="form-control maxPages_list" name="maxPages[]" id="field_'+ FieldCount +'"/></p>'
-         
+
          var keywordDE = '<p class="col-s-3"><input type="text" placeholder="Add Keyword for DE" class="form-control keyword_list" name="keywordDE[]" id="field_'+ FieldCount +'"/></p>'
          var keywordUK = '<p class="col-s-3"><input type="text" placeholder="Add Keyword for UK" class="form-control keyword_list" name="keywordUK[]" id="field_'+ FieldCount +'"/></p>'
          var keywordFR = '<p class="col-s-3"><input type="text" placeholder="Add Keyword for FR" class="form-control keyword_list" name="keywordFR[]" id="field_'+ FieldCount +'"/></p>'
          var keywordIT = '<p class="col-s-3"><input type="text" placeholder="Add Keyword for IT" class="form-control keyword_list" name="keywordIT[]" id="field_'+ FieldCount +'"/></p>'
          var keywordES = '<p class="col-s-3"><input type="text" placeholder="Add Keyword for ES" class="form-control keyword_list" name="keywordES[]" id="field_'+ FieldCount +'"/></p>'
          var keyword = '<div class="div-1"><div class="row">'+keywordDE+keywordUK+keywordFR+keywordIT+keywordES+'</div></div>'
-         
+
          var asinDE = '<p class="col-s-3"><input type="text" placeholder="Add Asin for DE" class="form-control asins_list" name="asinDE[]" id="field_'+ FieldCount +'"/></p>'
          var asinUK = '<p class="col-s-3"><input type="text" placeholder="Add Asin for UK" class="form-control asins_list" name="asinUK[]" id="field_'+ FieldCount +'"/></p>'
          var asinFR = '<p class="col-s-3"><input type="text" placeholder="Add Asin for FR" class="form-control asins_list" name="asinFR[]" id="field_'+ FieldCount +'"/></p>'
          var asinIT = '<p class="col-s-3"><input type="text" placeholder="Add Asin for IT" class="form-control asins_list" name="asinIT[]" id="field_'+ FieldCount +'"/></p>'
          var asinES = '<p class="col-s-3"><input type="text" placeholder="Add Asin for ES" class="form-control asins_list" name="asinES[]" id="field_'+ FieldCount +'"/></p>'
          var asin = '<div class="row">'+asinDE+asinUK+asinFR+asinIT+asinES+'</div>'
-         
+
          var reviewDE = '<p class="col-s-3"><input type="number" placeholder="Add No. of Review for DE" class="form-control review_list" name="reviewDE[]" id="field_'+ FieldCount +'"/></p>'
          var reviewUK = '<p class="col-s-3"><input type="number" placeholder="Add No. of Review for UK" class="form-control review_list" name="reviewUK[]" id="field_'+ FieldCount +'"/></p>'
          var reviewFR = '<p class="col-s-3"><input type="number" placeholder="Add No. of Review for FR" class="form-control review_list" name="reviewFR[]" id="field_'+ FieldCount +'"/></p>'
          var reviewIT = '<p class="col-s-3"><input type="number" placeholder="Add No. of Review for IT" class="form-control review_list" name="reviewIT[]" id="field_'+ FieldCount +'"/></p>'
          var reviewES = '<p class="col-s-3"><input type="number" placeholder="Add No. of Review for ES" class="form-control review_list" name="reviewES[]" id="field_'+ FieldCount +'"/></p>'
          var review = '<div class="div-1"><div class="row">'+reviewDE+reviewUK+reviewFR+reviewIT+reviewES+'</div></div>'
-         
+
          var priceDE = '<p class="col-s-3"><input type="number" placeholder="Add Price for DE" class="form-control price_list" name="priceDE[]" id="field_'+ FieldCount +'"/></p>'
          var priceUK = '<p class="col-s-3"><input type="number" placeholder="Add Price for UK" class="form-control price_list" name="priceUK[]" id="field_'+ FieldCount +'"/></p>'
          var priceFR = '<p class="col-s-3"><input type="number" placeholder="Add Price for FR" class="form-control price_list" name="priceFR[]" id="field_'+ FieldCount +'"/></p>'
          var priceIT = '<p class="col-s-3"><input type="number" placeholder="Add Price for IT" class="form-control price_list" name="priceIT[]" id="field_'+ FieldCount +'"/></p>'
          var priceES = '<p class="col-s-3"><input type="number" placeholder="Add Price for ES" class="form-control price_list" name="priceES[]" id="field_'+ FieldCount +'"/></p>'
          var price = '<div class="row">'+priceDE+priceUK+priceFR+priceIT+priceES+'</div>'
-         
+
          var ratingDE = '<p class="col-s-3"><input type="number" placeholder="Add Rating for DE" class="form-control rating_list" name="ratingDE[]" id="field_'+ FieldCount +'"/></p>'
          var ratingUK = '<p class="col-s-3"><input type="number" placeholder="Add Rating for UK" class="form-control rating_list" name="ratingUK[]" id="field_'+ FieldCount +'"/></p>'
          var ratingFR = '<p class="col-s-3"><input type="number" placeholder="Add Rating for FR" class="form-control rating_list" name="ratingFR[]" id="field_'+ FieldCount +'"/></p>'
          var ratingIT = '<p class="col-s-3"><input type="number" placeholder="Add Rating for IT" class="form-control rating_list" name="ratingIT[]" id="field_'+ FieldCount +'"/></p>'
          var ratingES = '<p class="col-s-3"><input type="number" placeholder="Add Rating for ES" class="form-control rating_list" name="ratingES[]" id="field_'+ FieldCount +'"/></p>'
          var rating = '<div class="div-1"><div class="row">'+ratingDE+ratingUK+ratingFR+ratingIT+ratingES+'</div></div>'
-         
+
          var removeButton = '<a href="#" class="btn btn-danger removeclass">Remove</a>'
-         
+
          var addButton = '<div class="row"><a href="#" class="btn btn-success addClass">Add More</a></div>'
-         
+
          var AddMore = '<div class="row"><div class="div-1"><div class="row">'+productName+'</div></div>'+'<div class = "row">'+maxPages+'</div>'+keyword+asin+review+price+rating+removeButton+addButton+'</div>';
-         
+
          var x = InputsWrapper.length; //initial text box count
          var FieldCount=1; //to keep track of text box added
-         
+
          $(AddButton).click(function (e)  //on add input button click
          {
                  if(x <= MaxInputs) //max input box allowed
@@ -77,7 +66,7 @@
                  }
          return false;
          });
-         
+
          $("body").on("click",".removeclass", function(e){ //user click on remove text
                  if( x > 1 ) {
                          $(this).parent('div').remove(); //remove text box
@@ -85,7 +74,7 @@
                  }
          return false;
          })
-         
+
          $("body").on("click",".addClass", function(e){ //user click on remove text
                  if(x <= MaxInputs) //max input box allowed
                  {
@@ -96,7 +85,7 @@
                  }
          return false;
          })
-         
+
           $('#submit').click(function(){
                     $.ajax({
                          url:"/submitQuery",
@@ -241,7 +230,31 @@
             </form>
          </div>
       </div>
-   </body>
-</html>
-{% endblock %}
+  <!-- End of Page Wrapper -->
 
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="static/vendor/jquery/jquery.min.js"></script>
+  <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="static/js/sb-admin-2.min.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="static/vendor/chart.js/Chart.min.js"></script>
+
+  <!-- Page level custom scripts -->
+  <script src="static/js/demo/chart-area-demo.js"></script>
+  <script src="static/js/demo/chart-pie-demo.js"></script>
+  <script src="static/js/demo/chart-bar-demo.js"></script>
+
+</body>
+
+</html>
