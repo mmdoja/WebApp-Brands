@@ -61,7 +61,7 @@ posts = [
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html', posts=posts)
+    return render_template('index.html', posts=posts)
 
 
 @app.route("/about")
@@ -137,7 +137,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route("/reset_password", methods=['GET', 'POST'])
+@app.route("/forgot-password", methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -150,10 +150,10 @@ def reset_request():
         send_email(form.email.data, subject, html)
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('login'))
-    return render_template('reset_request.html', title='Reset Password', form=form)
+    return render_template('forgot-password.html', title='Reset Password', form=form)
 
 
-@app.route("/reset_password/<token>", methods=['GET', 'POST'])
+@app.route("/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -198,7 +198,7 @@ def del_none(query):
     return query
 
 
-@app.route("/forms/job", methods=['GET', 'POST'])
+@app.route("/add_brand", methods=['GET', 'POST'])
 @login_required
 def create_job():
     form = AddBrandName()
@@ -207,7 +207,7 @@ def create_job():
         db_brands.insert_one(brand)
         flash('Job Created', 'success')
         return redirect(url_for('jobs'))
-    return render_template('add_brand.html', title='Create Job', form=form)
+    return render_template('add_brand.html', form=form)
 
 
 @app.route("/jobs", methods=['GET', 'POST'])
@@ -228,10 +228,10 @@ def jobs():
         filename = "query_Swingfit.hjson"
         subprocess.run('cd .. && cd marketplace-analysis && python3 Scraper.py %s'%filename,
                        shell=True, universal_newlines=True)
-    return render_template('jobs.html', title='Jobs', form=form, item=item)
+    return render_template('tables.html', title='Jobs', form=form, item=item)
 
 
-@app.route('/forms/query')
+@app.route('/query')
 @login_required
 def query_page():
     return render_template('newQueryFile.html')
@@ -364,4 +364,3 @@ def get_files(path):
 @app.route('/test')
 def test():
     return render_template('test.html')
-
