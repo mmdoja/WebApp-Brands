@@ -35,7 +35,7 @@
                <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
                <td><button type="button" name="add" id="AddMoreFileBox" class="btn btn-outline-dark">Run</button></td>
                <td><span class="badge badge-success">Unknown</span></td>
-               <td><a href="{{ url_for('download_file')}}"><button type="button" class="btn btn-outline-info">Download</button></a></td>
+               <td><a href="{{ url_for('download_file')}}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Download CSV</a></td>
             </tr>
             {% endfor %}
          </tbody>

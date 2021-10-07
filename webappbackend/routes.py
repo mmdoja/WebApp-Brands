@@ -18,6 +18,7 @@ from flask_login import login_required, current_user, login_user, logout_user
 if __name__ == '__main__':
     app.run(debug=True)
 
+global filename
 
 posts = [
     {
@@ -225,7 +226,6 @@ def jobs():
     form = RunScraper()
     if form.validate_on_submit():
         print('Scraper running clicked')
-        filename = "query_Swingfit.hjson"
         subprocess.run('cd .. && cd marketplace-analysis && python3 Scraper.py %s'%filename,
                        shell=True, universal_newlines=True)
     return render_template('tables.html', title='Jobs', form=form, item=item)
@@ -334,6 +334,8 @@ def query():
         filename = f"query_{brandName}_{timestamp}"
         with open(f"webappbackend/static/queries/{filename}.hjson", "w+") as fo:
             fo.write(str(del_none(complete_query)))
+        subprocess.run('cp webappbackend/static/queries/%s.hjson /home/mmdoja/marketplace-analysis/queries'%filename,
+                       shell=True, universal_newlines=True)
         db_queries.insert_one(del_none(complete_query))
         return jsonify(msg)
 

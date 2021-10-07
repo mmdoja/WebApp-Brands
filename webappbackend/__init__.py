@@ -7,7 +7,7 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://munir:12345@cluster0.mizkt.mongodb.net/webapp?retryWrites=true&w=majority"
+app.config["MONGO_URI"] = "mongodb+srv://munir:PLPFN0G4FRWyOHnw@webappcluster.x8qup.mongodb.net/amazingbrands?retryWrites=true&w=majority"
 app.config['MONGO_CONNECT']= False
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SECURITY_PASSWORD_SALT'] = 'abc123'
@@ -32,7 +32,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
 
-app.config['MAIL_DEFAULT_SENDER'] = 'mmdoja@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'QCXk4ThDa93pAnm@gmail.com'
 mail = Mail(app)
 
 from webappbackend import routes
