@@ -1,3 +1,6 @@
+import glob
+import json
+import os
 import subprocess
 from os import abort
 from time import time
@@ -18,7 +21,7 @@ from flask_login import login_required, current_user, login_user, logout_user
 if __name__ == '__main__':
     app.run(debug=True)
 
-global filename
+filename = None
 
 posts = [
     {
@@ -231,6 +234,20 @@ def jobs():
     return render_template('tables.html', title='Jobs', form=form, item=item)
 
 
+@app.route('/<string:id>/runScraper')
+def run_scraper(id):
+    brandname= id
+    r = re.compile(f'query_{brandname}_[0-9]+.hjson')
+    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp-backend/webappbackend/static/queries/')), default=0)
+    print(latest_file)
+    #subprocess.run('cp webappbackend/static/queries/%s.hjson /home/mmdoja/marketplace-analysis/queries'%latest_file,
+    #               shell=True, universal_newlines=True)
+    #subprocess.run('cd .. && cd marketplace-analysis && python3 Scraper.py %s'%filename,
+    #               shell=True, universal_newlines=True)
+    return redirect(url_for('jobs'))
+
+
+
 @app.route('/query')
 @login_required
 def query_page():
@@ -239,6 +256,7 @@ def query_page():
 
 @app.route("/submitQuery", methods=["POST", "GET"])
 def query():
+    global filename
     if request.method == 'POST':
         brandName = request.form.get('brandName')
         productName = request.form.getlist('productName[]')
@@ -352,6 +370,7 @@ def download_file():
             f.write(str(document))
     return redirect(url_for('jobs'))
 
+
 '''
 DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp-backend/webappbackend/static/queries"
 @app.route('/get-files/<path>',methods = ['GET','POST'])
@@ -362,6 +381,7 @@ def get_files(path):
     except FileNotFoundError:
         abort(404)
 '''
+
 
 @app.route('/test')
 def test():

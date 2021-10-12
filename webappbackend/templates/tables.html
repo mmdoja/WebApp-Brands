@@ -31,7 +31,7 @@
                <td class="highlight">{{item.brand}}</td>
                <td>{{item.date}}</td>
                <td><button type="button" name="query" id="query" class="btn btn-outline-success"><a href="{{ url_for('query_page')}}">Create</a></button></td>
-               <td>{{ form.submit(class="btn btn-outline-info") }}</td>
+               <td><button type="button" name="scrape" id={{item.brand}} class="btn btn-outline-info" onClick="reply_click(this.id)"><a href="{{url_for('run_scraper', id=item.brand)}}">Scrape</a></button></td>
                <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
                <td><button type="button" name="add" id="AddMoreFileBox" class="btn btn-outline-dark">Run</button></td>
                <td><span class="badge badge-success">Unknown</span></td>
@@ -88,6 +88,13 @@
 
   <!-- Page level custom scripts -->
   <script src="static/js/demo/datatables-demo.js"></script>
+
+  <script type="text/javascript">
+  function reply_click(clicked_id)
+  {
+      alert(clicked_id);
+  }
+  </script>
 
 </body>
 
