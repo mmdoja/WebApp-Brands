@@ -22,6 +22,7 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 filename = None
+latest_file = None
 
 posts = [
     {
@@ -236,16 +237,32 @@ def jobs():
 
 @app.route('/<string:id>/runScraper')
 def run_scraper(id):
+    global latest_file
     brandname= id
-    r = re.compile(f'query_{brandname}_[0-9]+.hjson')
-    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp-backend/webappbackend/static/queries/')), default=0)
+    r = re.compile(f'{brandname}_[0-9]+_query.hjson')
+    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp-backend/webappbackend/static/queries/')),
+                      default=0)
     print(latest_file)
-    #subprocess.run('cp webappbackend/static/queries/%s.hjson /home/mmdoja/marketplace-analysis/queries'%latest_file,
-    #               shell=True, universal_newlines=True)
-    #subprocess.run('cd .. && cd marketplace-analysis && python3 Scraper.py %s'%filename,
-    #               shell=True, universal_newlines=True)
+    subprocess.run('cp webappbackend/static/queries/%s /home/mmdoja/marketplace-scraper/queries'%latest_file, shell=True, universal_newlines=True)
+    subprocess.run('cd .. && cd marketplace-scraper && bash main.sh %s'%latest_file, shell=True, universal_newlines=True)
     return redirect(url_for('jobs'))
 
+
+@app.route('/<string:id>/runDownload')
+def download_file(id):
+    brandname = id
+    r = re.compile(f'{brandname}_[0-9]+_query.hjson')
+    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp-backend/webappbackend/static/queries/')), default=0)
+    name_time = re.search('(.+?)_(.+?)_', latest_file).group()
+    filename = name_time+"items.csv"
+    subprocess.run('cp /home/mmdoja/marketplace-scraper/results/%s /home/mmdoja/webapp-backend/webappbackend/static/results'%filename,
+                   shell=True, universal_newlines=True)
+    DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp-backend/webappbackend/static/results"
+    try:
+        return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
+    return redirect(url_for('jobs'))
 
 
 @app.route('/query')
@@ -349,15 +366,15 @@ def query():
             flag=flag+1
         print(del_none(complete_query))
         timestamp = int(time())
-        filename = f"query_{brandName}_{timestamp}"
-        with open(f"webappbackend/static/queries/{filename}.hjson", "w+") as fo:
+        filename = f"{brandName}_{timestamp}"
+        with open(f"webappbackend/static/queries/{filename}_query.hjson", "w+") as fo:
             fo.write(str(del_none(complete_query)))
         subprocess.run('cp webappbackend/static/queries/%s.hjson /home/mmdoja/marketplace-analysis/queries'%filename,
                        shell=True, universal_newlines=True)
         db_queries.insert_one(del_none(complete_query))
         return jsonify(msg)
 
-
+'''
 @app.route('/downloadfile')
 def download_file():
     brand = 'Nordic'
@@ -369,7 +386,7 @@ def download_file():
         with open(f"queries/test.csv", 'w+') as f:
             f.write(str(document))
     return redirect(url_for('jobs'))
-
+'''
 
 '''
 DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp-backend/webappbackend/static/queries"
