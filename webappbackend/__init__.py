@@ -7,7 +7,7 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://munir:PLPFN0G4FRWyOHnw@webappcluster.x8qup.mongodb.net/amazingbrands?retryWrites=true&w=majority"
+app.config["MONGO_URI"] = "mongodb+srv://munir:PLPFN0G4FRWyOHnw@devcluster.x8qup.mongodb.net/webapp?retryWrites=true&w=majority"
 app.config['MONGO_CONNECT']= False
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SECURITY_PASSWORD_SALT'] = 'abc123'

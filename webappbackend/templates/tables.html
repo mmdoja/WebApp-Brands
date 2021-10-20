@@ -34,7 +34,7 @@
                <td><button type="button" name="scrape" id={{item.brand}} class="btn btn-outline-info" onClick="reply_click(this.id)"><a href="{{url_for('run_scraper', id=item.brand)}}">Scrape</a></button></td>
                <td><button type="button" name="matcher" id="matcher" class="btn btn-outline-warning">Match</button></td>
                <td><button type="button" name="add" id="AddMoreFileBox" class="btn btn-outline-dark">Run</button></td>
-               <td><span class="badge badge-success">Unknown</span></td>
+               <td><span class="badge badge-secondary">{{item.status}}</span></td>
                <td><a href="{{url_for('download_file', id=item.brand)}}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Download CSV</a></td>
             </tr>
             {% endfor %}

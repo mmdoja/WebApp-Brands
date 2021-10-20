@@ -23,6 +23,7 @@ if __name__ == '__main__':
 
 filename = None
 latest_file = None
+status = 'Idle'
 
 posts = [
     {
@@ -207,7 +208,7 @@ def del_none(query):
 @login_required
 def create_job():
     form = AddBrandName()
-    brand = {'brand': form.brand.data, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    brand = {'brand': form.brand.data, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'status':'Idle'}
     if form.validate_on_submit():
         db_brands.insert_one(brand)
         flash('Job Created', 'success')
@@ -218,6 +219,7 @@ def create_job():
 @app.route("/jobs", methods=['GET', 'POST'])
 @login_required
 def jobs():
+    global status
     cursor = db_brands.aggregate(
         [
             {"$sort": {'date': -1}}
@@ -225,7 +227,7 @@ def jobs():
     )
     item=[]
     for document in cursor:
-        an_item = dict(brand=document.get('brand'), date=document.get('date'))
+        an_item = dict(brand=document.get('brand'), date=document.get('date'), status=document.get('status'))
         item.append(an_item)
     form = RunScraper()
     if form.validate_on_submit():
@@ -238,11 +240,14 @@ def jobs():
 @app.route('/<string:id>/runScraper')
 def run_scraper(id):
     global latest_file
+    global status
     brandname= id
     r = re.compile(f'{brandname}_[0-9]+_query.hjson')
-    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp-backend/webappbackend/static/queries/')),
+    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp/webappbackend/static/queries/')),
                       default=0)
     print(latest_file)
+    status = 'Scraper running'
+    update_status(brandname, status)
     subprocess.run('cp webappbackend/static/queries/%s /home/mmdoja/marketplace-scraper/queries'%latest_file, shell=True, universal_newlines=True)
     subprocess.run('cd .. && cd marketplace-scraper && bash main.sh %s'%latest_file, shell=True, universal_newlines=True)
     return redirect(url_for('jobs'))
@@ -250,19 +255,34 @@ def run_scraper(id):
 
 @app.route('/<string:id>/runDownload')
 def download_file(id):
+    global status
     brandname = id
-    r = re.compile(f'{brandname}_[0-9]+_query.hjson')
-    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp-backend/webappbackend/static/queries/')), default=0)
-    name_time = re.search('(.+?)_(.+?)_', latest_file).group()
-    filename = name_time+"items.csv"
-    subprocess.run('cp /home/mmdoja/marketplace-scraper/results/%s /home/mmdoja/webapp-backend/webappbackend/static/results'%filename,
-                   shell=True, universal_newlines=True)
-    DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp-backend/webappbackend/static/results"
     try:
+        r = re.compile(f'{brandname}_[0-9]+_query.hjson')
+        latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp/webappbackend/static/queries/')), default=0)
+        name_time = re.search('(.+?)_(.+?)_', latest_file).group()
+        filename = name_time+"items.csv"
+        subprocess.run('cp /home/mmdoja/marketplace-scraper/results/%s /home/mmdoja/webapp/webappbackend/static/results'%filename,
+                   shell=True, universal_newlines=True)
+        DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp/webappbackend/static/results"
+        status = 'Idle'
+        update_status(brandname, status)
         return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
     except FileNotFoundError:
-        abort(404)
+        status = 'File not available yet'
+        update_status(brandname, status)
+    except TypeError:
+        status = 'File not available yet'
+        update_status(brandname, status)
     return redirect(url_for('jobs'))
+
+
+def update_status(name, status):
+    brand = db_brands.find_one({
+        "brand": name
+    })
+    filt = {"$set": {'status': status}}
+    db_brands.update_one(brand, filt)
 
 
 @app.route('/query')
