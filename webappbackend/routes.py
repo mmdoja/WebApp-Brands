@@ -1,8 +1,5 @@
-import glob
-import json
 import os
 import subprocess
-from os import abort
 from time import time
 from datetime import datetime
 from bson import ObjectId
@@ -17,62 +14,20 @@ from .user import User
 from .email import send_email
 from flask_login import login_required, current_user, login_user, logout_user
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
 filename = None
 latest_file = None
 status = 'Idle'
 
-posts = [
-    {
-        'name': 'Janik Euskirchen',
-        'linkedin': 'https://www.linkedin.com/in/janikeuskirchen/',
-        'position': 'Data Scientist and Software Developer',
-        'content': 'First post content',
-        'date_posted': 'April 20, 2018'
-    },
-    {
-        'name': 'Mohammad Munirud Doja',
-        'linkedin': 'https://www.linkedin.com/in/mohammadmuniruddoja/',
-        'position': 'Software Developer',
-        'content': 'Second post content',
-        'date_posted': 'April 21, 2018'
-    },
-{
-        'name': 'Zakir Ayub Bhuiyan',
-        'linkedin': 'https://www.linkedin.com/in/zakir-tushar/',
-        'position': 'Software Developer',
-        'content': 'Third post content',
-        'date_posted': 'April 21, 2018'
-    },
-{
-        'name': 'Divyanshu Katiyar',
-        'linkedin': 'https://www.linkedin.com/in/divyanshu-katiyar-45ba03131/',
-        'position': 'Data Scientist',
-        'content': 'Fourth post content',
-        'date_posted': 'April 21, 2018'
-    },
-{
-        'name': 'Nadezda Tyulneva',
-        'linkedin': 'https://www.linkedin.com/in/nadezda-tyulneva-85057315b/',
-        'position': 'Data Scientist',
-        'content': 'Fifth post content',
-        'date_posted': 'April 21, 2018'
-    }
-]
-
-
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('index.html', posts=posts)
+    return render_template('index.html')
 
 
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
+
 
 #register route
 @app.route("/register", methods=['GET', 'POST'])
@@ -243,12 +198,12 @@ def run_scraper(id):
     global status
     brandname= id
     r = re.compile(f'{brandname}_[0-9]+_query.hjson')
-    latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp/webappbackend/static/queries/')),
+    latest_file = max(filter(r.search, os.listdir('/home/munir/webapp/webappbackend/static/queries/')),
                       default=0)
     print(latest_file)
     status = 'Scraper running'
     update_status(brandname, status)
-    subprocess.run('cp webappbackend/static/queries/%s /home/mmdoja/marketplace-scraper/queries'%latest_file, shell=True, universal_newlines=True)
+    subprocess.run('cp webappbackend/static/queries/%s /home/munir/marketplace-scraper/queries'%latest_file, shell=True, universal_newlines=True)
     subprocess.run('cd .. && cd marketplace-scraper && bash main.sh %s'%latest_file, shell=True, universal_newlines=True)
     return redirect(url_for('jobs'))
 
@@ -259,12 +214,12 @@ def download_file(id):
     brandname = id
     try:
         r = re.compile(f'{brandname}_[0-9]+_query.hjson')
-        latest_file = max(filter(r.search, os.listdir('/home/mmdoja/webapp/webappbackend/static/queries/')), default=0)
+        latest_file = max(filter(r.search, os.listdir('/home/munir/webapp/webappbackend/static/queries/')), default=0)
         name_time = re.search('(.+?)_(.+?)_', latest_file).group()
         filename = name_time+"items.csv"
-        subprocess.run('cp /home/mmdoja/marketplace-scraper/results/%s /home/mmdoja/webapp/webappbackend/static/results'%filename,
+        subprocess.run('cp /home/munir/marketplace-scraper/results/%s /home/munir/webapp/webappbackend/static/results'%filename,
                    shell=True, universal_newlines=True)
-        DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp/webappbackend/static/results"
+        DOWNLOAD_DIRECTORY = "/home/munir/webapp/webappbackend/static/results"
         status = 'Idle'
         update_status(brandname, status)
         return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
@@ -389,35 +344,10 @@ def query():
         filename = f"{brandName}_{timestamp}"
         with open(f"webappbackend/static/queries/{filename}_query.hjson", "w+") as fo:
             fo.write(str(del_none(complete_query)))
-        subprocess.run('cp webappbackend/static/queries/%s.hjson /home/mmdoja/marketplace-analysis/queries'%filename,
+        subprocess.run('cp webappbackend/static/queries/%s.hjson /home/munir/marketplace-analysis/queries'%filename,
                        shell=True, universal_newlines=True)
         db_queries.insert_one(del_none(complete_query))
         return jsonify(msg)
-
-'''
-@app.route('/downloadfile')
-def download_file():
-    brand = 'Nordic'
-    cursor = db_queries.find({
-        'brand': brand
-    })
-    for document in cursor:
-        print(document)
-        with open(f"queries/test.csv", 'w+') as f:
-            f.write(str(document))
-    return redirect(url_for('jobs'))
-'''
-
-'''
-DOWNLOAD_DIRECTORY = "/home/mmdoja/webapp-backend/webappbackend/static/queries"
-@app.route('/get-files/<path>',methods = ['GET','POST'])
-def get_files(path):
-    """Download a file."""
-    try:
-        return send_from_directory(DOWNLOAD_DIRECTORY, path, as_attachment=True)
-    except FileNotFoundError:
-        abort(404)
-'''
 
 
 @app.route('/test')
