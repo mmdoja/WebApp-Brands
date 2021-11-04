@@ -38,6 +38,7 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
+
 class RequestResetForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
@@ -84,7 +85,3 @@ class UpdateAccountForm(FlaskForm):
 class AddBrandName(FlaskForm):
     brand = StringField('Brand Name', validators=[DataRequired()])
     submit = SubmitField('Create Job')
-
-
-class RunScraper(FlaskForm):
-    submit = SubmitField('Scrape')

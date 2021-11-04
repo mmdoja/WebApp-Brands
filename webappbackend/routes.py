@@ -5,8 +5,7 @@ from datetime import datetime
 from bson import ObjectId
 from flask import render_template, url_for, flash, redirect, request, session, jsonify, send_from_directory
 from webappbackend import app, bcrypt, db_users, lm, db_queries, db_brands
-from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm, \
-    RunScraper
+from webappbackend.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm
 from webappbackend.forms import AddBrandName
 from webappbackend.token import generate_confirmation_token, generate_password_reset_token, confirm_token
 import re
@@ -18,15 +17,18 @@ filename = None
 latest_file = None
 status = 'Idle'
 
+#loads the current user
+@lm.user_loader
+def load_user(user_id):
+    user_json = db_users.find_one({'_id': ObjectId(user_id)})
+    return User(user_json)
+
+
+#route for home page/dashboard
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template('index.html')
-
-
-@app.route("/about")
-def about():
-    return render_template('about.html', title='About')
 
 
 #register route
@@ -52,11 +54,8 @@ def register():
             return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@lm.user_loader
-def load_user(user_id):
-    user_json = db_users.find_one({'_id': ObjectId(user_id)})
-    return User(user_json)
 
+#route to confirm account registeration through email
 @app.route("/confirm/<token>")
 def confirm_email(token):
     email = confirm_token(token)
@@ -98,6 +97,7 @@ def logout():
     return redirect(url_for('login'))
 
 
+#route to generate the password reset request and send email
 @app.route("/forgot-password", methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
@@ -114,6 +114,7 @@ def reset_request():
     return render_template('forgot-password.html', title='Reset Password', form=form)
 
 
+#route to reset the password from the link in the email
 @app.route("/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
@@ -127,11 +128,11 @@ def reset_token(token):
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         filt = {"$set": {'password': hashed_password}}
         db_users.update_one(user, filt)
-        flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('reset_password.html', title='Reset Password', form=form)
 
 
+#function to change account settings
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -150,6 +151,7 @@ def account():
     return render_template('account.html', user=user, title='Account', form=form)
 
 
+#function to delete the blanks or null value entered
 def del_none(query):
     for key, value in list(query.items()):
         if value is None or value == "" or value == [""] or value == 0:
@@ -159,6 +161,7 @@ def del_none(query):
     return query
 
 
+#route to add a new brand
 @app.route("/add_brand", methods=['GET', 'POST'])
 @login_required
 def create_job():
@@ -166,11 +169,11 @@ def create_job():
     brand = {'brand': form.brand.data, 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'status':'Idle'}
     if form.validate_on_submit():
         db_brands.insert_one(brand)
-        flash('Job Created', 'success')
         return redirect(url_for('jobs'))
     return render_template('add_brand.html', form=form)
 
 
+#route to display all the brands in a table format
 @app.route("/jobs", methods=['GET', 'POST'])
 @login_required
 def jobs():
@@ -184,68 +187,17 @@ def jobs():
     for document in cursor:
         an_item = dict(brand=document.get('brand'), date=document.get('date'), status=document.get('status'))
         item.append(an_item)
-    form = RunScraper()
-    if form.validate_on_submit():
-        print('Scraper running clicked')
-        subprocess.run('cd .. && cd marketplace-analysis && python3 Scraper.py %s'%filename,
-                       shell=True, universal_newlines=True)
-    return render_template('tables.html', title='Jobs', form=form, item=item)
+    return render_template('tables.html', title='Jobs', item=item)
 
 
-@app.route('/<string:id>/runScraper')
-def run_scraper(id):
-    global latest_file
-    global status
-    brandname= id
-    r = re.compile(f'{brandname}_[0-9]+_query.hjson')
-    latest_file = max(filter(r.search, os.listdir('/home/munir/webapp/webappbackend/static/queries/')),
-                      default=0)
-    print(latest_file)
-    status = 'Scraper running'
-    update_status(brandname, status)
-    subprocess.run('cp webappbackend/static/queries/%s /home/munir/marketplace-scraper/queries'%latest_file, shell=True, universal_newlines=True)
-    subprocess.run('cd .. && cd marketplace-scraper && bash main.sh %s'%latest_file, shell=True, universal_newlines=True)
-    return redirect(url_for('jobs'))
-
-
-@app.route('/<string:id>/runDownload')
-def download_file(id):
-    global status
-    brandname = id
-    try:
-        r = re.compile(f'{brandname}_[0-9]+_query.hjson')
-        latest_file = max(filter(r.search, os.listdir('/home/munir/webapp/webappbackend/static/queries/')), default=0)
-        name_time = re.search('(.+?)_(.+?)_', latest_file).group()
-        filename = name_time+"items.csv"
-        subprocess.run('cp /home/munir/marketplace-scraper/results/%s /home/munir/webapp/webappbackend/static/results'%filename,
-                   shell=True, universal_newlines=True)
-        DOWNLOAD_DIRECTORY = "/home/munir/webapp/webappbackend/static/results"
-        status = 'Idle'
-        update_status(brandname, status)
-        return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
-    except FileNotFoundError:
-        status = 'File not available yet'
-        update_status(brandname, status)
-    except TypeError:
-        status = 'File not available yet'
-        update_status(brandname, status)
-    return redirect(url_for('jobs'))
-
-
-def update_status(name, status):
-    brand = db_brands.find_one({
-        "brand": name
-    })
-    filt = {"$set": {'status': status}}
-    db_brands.update_one(brand, filt)
-
-
+#route to create new query
 @app.route('/query')
 @login_required
 def query_page():
     return render_template('newQueryFile.html')
 
 
+#function triggered when clicking submit of the new query file
 @app.route("/submitQuery", methods=["POST", "GET"])
 def query():
     global filename
@@ -350,6 +302,52 @@ def query():
         return jsonify(msg)
 
 
-@app.route('/test')
-def test():
-    return render_template('test.html')
+#route for running the scraper with the latest query file of the brand
+@app.route('/<string:id>/runScraper')
+def run_scraper(id):
+    global latest_file
+    global status
+    brandname= id
+    r = re.compile(f'{brandname}_[0-9]+_query.hjson')
+    latest_file = max(filter(r.search, os.listdir('/home/munir/webapp/webappbackend/static/queries/')),
+                      default=0)
+    print(latest_file)
+    status = 'Scraper running'
+    update_status(brandname, status)
+    subprocess.run('cp webappbackend/static/queries/%s /home/munir/marketplace-scraper/queries'%latest_file, shell=True, universal_newlines=True)
+    subprocess.run('cd .. && cd marketplace-scraper && bash main.sh %s'%latest_file, shell=True, universal_newlines=True)
+    return redirect(url_for('jobs'))
+
+
+#route for downloading the CSV after scraping
+@app.route('/<string:id>/runDownload')
+def download_file(id):
+    global status
+    brandname = id
+    try:
+        r = re.compile(f'{brandname}_[0-9]+_query.hjson')
+        latest_file = max(filter(r.search, os.listdir('/home/munir/webapp/webappbackend/static/queries/')), default=0)
+        name_time = re.search('(.+?)_(.+?)_', latest_file).group()
+        filename = name_time+"items.csv"
+        subprocess.run('cp /home/munir/marketplace-scraper/results/%s /home/munir/webapp/webappbackend/static/results'%filename,
+                   shell=True, universal_newlines=True)
+        DOWNLOAD_DIRECTORY = "/home/munir/webapp/webappbackend/static/results"
+        status = 'Idle'
+        update_status(brandname, status)
+        return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
+    except FileNotFoundError:
+        status = 'File not available yet'
+        update_status(brandname, status)
+    except TypeError:
+        status = 'File not available yet'
+        update_status(brandname, status)
+    return redirect(url_for('jobs'))
+
+
+#updates the status according to the direction given
+def update_status(name, status):
+    brand = db_brands.find_one({
+        "brand": name
+    })
+    filt = {"$set": {'status': status}}
+    db_brands.update_one(brand, filt)

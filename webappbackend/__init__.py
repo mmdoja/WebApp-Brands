@@ -7,10 +7,10 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://munir:PLPFN0G4FRWyOHnw@devcluster.x8qup.mongodb.net/webapp?retryWrites=true&w=majority"
+app.config["MONGO_URI"] = os.environ.get('DB_URI')
 app.config['MONGO_CONNECT']= False
-app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
-app.config['SECURITY_PASSWORD_SALT'] = 'abc123'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
 
 mongo = PyMongo(app)
 db_users = mongo.db.users
@@ -31,7 +31,6 @@ app.config['MAIL_USE_SSL'] = True
 # gmail authentication
 app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
-
 app.config['MAIL_DEFAULT_SENDER'] = 'QCXk4ThDa93pAnm@gmail.com'
 mail = Mail(app)
 
